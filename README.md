@@ -1,0 +1,1 @@
+# eletronic-components-detection

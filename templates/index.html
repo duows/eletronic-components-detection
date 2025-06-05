@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconhecimento de Componentes Eletrônicos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Reconhecimento de Componentes Eletrônicos em Imagens</h1>
+    </header>
+
+    <div class="container">
+        <!-- Bloco para exibir Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Seção de Upload de Arquivo e Webcam Integrada -->
+        <section class="upload-section">
+            <h2>Fazer Upload ou Usar Câmera</h2>
+            <form method="POST" enctype="multipart/form-data" class="upload-form" id="upload-form">
+                <!-- Input de arquivo real (oculto pela técnica do label) -->
+                <input type="file" name="image" id="file-upload" accept="image/png, image/jpeg, image/jpg" required>
+                
+                <div class="form-button-group"> <!-- Novo grupo para botões de ação -->
+                    <label for="file-upload" class="custom-file-upload">
+                        <span class="icon-upload">&#128190;</span> 
+                        Escolher Arquivo
+                    </label>
+                    <button type="button" id="trigger-webcam-btn" class="custom-file-upload">
+                        <span class="icon-camera">&#128247;</span> 
+                        Usar Câmera
+                    </button>
+                </div>
+                <span id="file-name-display">Nenhum arquivo selecionado</span>
+                <input type="submit" value="Processar Imagem" class="submit-button">
+            </form>
+            
+            <!-- Container para elementos da webcam, aparecerá aqui -->
+            <div class="webcam-container">
+                <video id="webcam-stream" autoplay playsinline></video>
+                <button id="capture-photo-btn">Capturar Foto</button>
+                <canvas id="webcam-canvas"></canvas>
+                <p id="camera-status"></p>
+            </div>
+        </section>
+
+        {% if processed_image_path %}
+        <section class="results-section">
+            <h2>Imagem Processada</h2>
+            <img src="{{ url_for('static', filename=processed_image_path) }}" alt="Imagem Processada" class="processed-image">
+            
+            <h2>Componentes Detectados:</h2>
+            {% if detected_components_info %}
+                {% for component in detected_components_info %}
+                <div class="component-info">
+                    {% if component.image_url %}
+                    <img src="{{ component.image_url }}" alt="{{ component.name }} symbol">
+                    {% endif %}
+                    <h3>{{ component.name }}</h3>
+                    <p><strong>Explicação:</strong> {{ component.explanation }}</p>
+                    {% if component.formulas %}
+                    <p><strong>Fórmulas Relevantes:</strong></p>
+                    <ul>
+                        {% for formula in component.formulas %}
+                        <li>{{ formula }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum componente conhecido foi detectado (ou confiança abaixo do limiar).</p>
+            {% endif %}
+        </section>
+        {% endif %}
+        {# Removido o bloco {% if error %} pois as flash messages o substituem de forma mais genérica #}
+    </div>
+
+    <footer>
+        <p>&copy; 2025 - Camila Albieri Mattos & Henrique José de Souza</p>
+        <p>Instituto Federal de Educação, Ciência e Tecnologia de São Paulo - Câmpus Birigui</p>
+    </footer>
+
+    <script>
+        // Lógica para o upload de arquivo customizado
+        (function() {
+            const fileUploadInput = document.getElementById('file-upload');
+            const fileNameDisplay = document.getElementById('file-name-display');
+            
+            if (fileUploadInput && fileNameDisplay) {
+                fileUploadInput.onchange = function () {
+                    if (this.files && this.files.length > 0) {
+                        fileNameDisplay.textContent = this.files[0].name;
+                    } else {
+                        fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+                    }
+                };
+            } else {
+                if (!fileUploadInput) console.error("Elemento 'file-upload' não encontrado.");
+                if (!fileNameDisplay) console.error("Elemento 'file-name-display' não encontrado.");
+            }
+        })();
+
+        // Lógica para a funcionalidade da webcam (integrada)
+        (function() {
+            const triggerWebcamButton = document.getElementById('trigger-webcam-btn');
+            const capturePhotoButton = document.getElementById('capture-photo-btn');
+            const videoElement = document.getElementById('webcam-stream');
+            const canvasElement = document.getElementById('webcam-canvas');
+            const cameraStatus = document.getElementById('camera-status');
+            const fileUploadInput = document.getElementById('file-upload'); 
+            const fileNameDisplay = document.getElementById('file-name-display'); 
+            let stream = null;
+
+            if (!triggerWebcamButton || !capturePhotoButton || !videoElement || !canvasElement || !cameraStatus || !fileUploadInput || !fileNameDisplay) {
+                console.error("Um ou mais elementos da webcam ou do upload não foram encontrados no DOM.");
+                if (!triggerWebcamButton) console.error("'trigger-webcam-btn' não encontrado.");
+                if (!capturePhotoButton) console.error("'capture-photo-btn' não encontrado.");
+                if (!videoElement) console.error("'webcam-stream' não encontrado.");
+                if (!canvasElement) console.error("'webcam-canvas' não encontrado.");
+                if (!cameraStatus) console.error("'camera-status' não encontrado.");
+                if (!fileUploadInput) console.error("'file-upload' não encontrado.");
+                if (!fileNameDisplay) console.error("'file-name-display' não encontrado.");
+                return; 
+            }
+
+            triggerWebcamButton.addEventListener('click', async () => {
+                console.log("'Usar Câmera' (triggerWebcamButton) clicado.");
+                if (stream) { 
+                    console.log("Câmera já está ativa, desligando...");
+                    stream.getTracks().forEach(track => track.stop());
+                    videoElement.style.display = 'none';
+                    capturePhotoButton.style.display = 'none';
+                    triggerWebcamButton.innerHTML = '<span class="icon-camera">&#128247;</span> Usar Câmera'; 
+                    cameraStatus.textContent = '';
+                    stream = null;
+                    return;
+                }
+                
+                console.log("Tentando abrir a câmera...");
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    cameraStatus.textContent = 'Câmera traseira ativa. Posicione o componente e capture.';
+                    console.log("Câmera traseira acessada.");
+                } catch (err) {
+                    console.warn("Falha ao acessar câmera traseira, tentando qualquer câmera: ", err);
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        cameraStatus.textContent = 'Câmera frontal/padrão ativa. Posicione o componente e capture.';
+                        console.log("Câmera frontal/padrão acessada (fallback).");
+                    } catch (fallbackErr) {
+                        console.error("Erro ao acessar qualquer câmera (fallback): ", fallbackErr);
+                        cameraStatus.textContent = `Erro ao acessar câmera: ${fallbackErr.name}. Verifique as permissões.`;
+                        if (fallbackErr.name === "NotFoundError" || fallbackErr.name === "DevicesNotFoundError") {
+                             cameraStatus.textContent = "Nenhuma câmera encontrada.";
+                        } else if (fallbackErr.name === "NotAllowedError" || fallbackErr.name === "PermissionDeniedError") {
+                            cameraStatus.textContent = "Permissão para acessar a câmera negada.";
+                        }
+                        return; 
+                    }
+                }
+                
+                videoElement.srcObject = stream;
+                videoElement.style.display = 'block'; 
+                capturePhotoButton.style.display = 'block'; 
+                triggerWebcamButton.innerHTML = '<span class="icon-camera">&#128247;</span> Fechar Câmera'; 
+                console.log("Stream da câmera atribuído e controles atualizados.");
+            });
+
+            capturePhotoButton.addEventListener('click', () => {
+                console.log("'Capturar Foto' clicado.");
+                if (!stream || !videoElement.srcObject || videoElement.readyState < videoElement.HAVE_CURRENT_DATA) {
+                    cameraStatus.textContent = 'Câmera não está ativa ou pronta para captura.';
+                    console.warn("Tentativa de captura com stream não pronto ou inexistente.");
+                    return;
+                }
+                
+                console.log("Desenhando imagem no canvas...");
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+
+                const context = canvasElement.getContext('2d');
+                context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+                
+                console.log("Convertendo canvas para blob...");
+                canvasElement.toBlob(function(blob) {
+                    if (!blob) {
+                        console.error("Falha ao criar blob a partir do canvas.");
+                        cameraStatus.textContent = "Erro ao capturar imagem. Tente novamente.";
+                        return;
+                    }
+                    console.log("Blob criado, criando File object...");
+                    const capturedFile = new File([blob], "webcam_capture.jpg", { type: "image/jpeg", lastModified: Date.now() });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(capturedFile);
+                    
+                    fileUploadInput.files = dataTransfer.files;
+                    console.log("Arquivo capturado atribuído ao input file.");
+
+                    if (fileNameDisplay) {
+                        fileNameDisplay.textContent = capturedFile.name;
+                    }
+                    cameraStatus.textContent = 'Imagem capturada! Clique em "Processar Imagem" abaixo.';
+                    
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                        videoElement.style.display = 'none';
+                        capturePhotoButton.style.display = 'none';
+                        triggerWebcamButton.innerHTML = '<span class="icon-camera">&#128247;</span> Usar Câmera';
+                        stream = null;
+                        console.log("Câmera desligada após captura.");
+                    }
+                    
+                }, 'image/jpeg', 0.95); 
+            });
+        })();
+    </script>
+</body>
+</html>

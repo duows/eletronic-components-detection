@@ -1,0 +1,62 @@
+{
+  "resistor": {
+    "name": "Resistor",
+    "explanation": "Um componente elétrico passivo de dois terminais que implementa resistência elétrica como um elemento de circuito. Resistores atuam para reduzir o fluxo de corrente e, ao mesmo tempo, atuam para diminuir os níveis de tensão dentro dos circuitos.",
+    "formulas": ["Lei de Ohm: V = IR", "Potência: P = IV = I²R = V²/R"],
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Resistor_symbol_America.svg/1280px-Resistor_symbol_America.svg.png"
+  },
+  "capacitor": {
+    "name": "Capacitor",
+    "explanation": "Um componente eletrônico passivo de dois terminais que armazena energia elétrica em um campo elétrico. Consiste em dois condutores separados por um material dielétrico. Quando uma tensão é aplicada através dos condutores, um campo elétrico se desenvolve através do dielétrico, fazendo com que carga positiva se acumule em uma placa e carga negativa na outra.",
+    "formulas": ["Capacitância: C = Q/V", "Energia Armazenada: E = 1/2 * CV²"],
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7LhZ5eB0glTrKHSwiwWjc-7wm8xN7KSDkYA&s"
+  },
+  "LED": {
+    "name": "LED (Diodo Emissor de Luz)",
+    "explanation": "Uma fonte de luz semicondutora que emite luz quando a corrente flui através dela. Elétrons no semicondutor se recombinam com lacunas de elétrons, liberando energia na forma de fótons.",
+    "formulas": ["Tensão Direta (Vf) varia por cor/tipo"],
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsKYttnnJyQLDTJQO10b8Jb6YuuxOVTlgLCw&s"
+  },
+  "transistor": {
+    "name": "Transistor",
+    "explanation": "Um dispositivo semicondutor usado para amplificar ou comutar sinais eletrônicos e energia elétrica. É composto de material semicondutor geralmente com pelo menos três terminais para conexão a um circuito externo.",
+    "formulas": ["Ganho de Corrente (β) = Ic/Ib (para BJT)"],
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Transistor_NPN_symbol.svg/200px-Transistor_NPN_symbol.svg.png"
+  },
+  "LDR": {
+    "name": "LDR (Resistor Dependente de Luz)",
+    "explanation": "Um tipo de resistor cuja resistência varia com a intensidade da luz incidente. Também conhecido como fotorresistor.",
+    "formulas": ["A resistência diminui com o aumento da intensidade da luz."],
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwGUHjmOJZSEh4Dg1D9jx532QBuQyfPREccQ&s"
+  },
+  "circuito integrado": {
+    "name": "Circuito Integrado (CI)",
+    "explanation": "Um conjunto de circuitos eletrônicos em uma pequena placa plana (chip) de material semicondutor, normalmente silício. Integra um grande número de pequenos transistores e outros componentes eletrônicos.",
+    "formulas": ["Varia muito dependendo da função do CI."],
+    "image_url": "https://www.allaboutcircuits.com/uploads/articles/integrated_circuit_symbol.jpeg"
+  },
+  "diodo": {
+    "name": "Diodo",
+    "explanation": "Um componente eletrônico de dois terminais que conduz corrente primariamente em uma direção; tem baixa resistência na uma direção e alta resistência na outra.",
+    "formulas": ["Equação do diodo de Shockley (aproximação)."],
+    "image_url": "https://openclipart.org/image/800px/8189"
+  },
+  "display 7 segmentos": {
+    "name": "Display de 7 Segmentos",
+    "explanation": "Uma forma de dispositivo de exibição eletrônica para exibir numerais decimais. Consiste em sete segmentos de LED (ou LCD) que podem ser ligados ou desligados individualmente para formar diferentes caracteres.",
+    "formulas": ["N/A (controle digital dos segmentos)."],
+    "image_url": ""
+  },
+  "potenciometro": {
+    "name": "Potenciômetro",
+    "explanation": "Um resistor variável de três terminais com um contato deslizante ou rotativo que forma um divisor de tensão ajustável. Se apenas dois terminais são usados (um terminal e o cursor), ele atua como um resistor variável ou reostato.",
+    "formulas": ["Divisor de tensão: Vout = (R2 / (R1 + R2)) * Vin"],
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Potentiometer_symbol.svg/600px-Potentiometer_symbol.svg.png"
+  },
+  "transformador": {
+    "name": "Transformador",
+    "explanation": "Um dispositivo elétrico passivo que transfere energia elétrica de um circuito elétrico para outro, ou múltiplos circuitos, através de indução eletromagnética. É mais comumente usado para aumentar ('step-up') ou diminuir ('step-down') os níveis de tensão entre circuitos.",
+    "formulas": ["Relação de espiras: Vp/Vs = Np/Ns = Is/Ip"],
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Transformer_Iron_Core.svg/480px-Transformer_Iron_Core.svg.png"
+  }
+}

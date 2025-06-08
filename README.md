@@ -30,7 +30,6 @@ Este projeto foi construído com as seguintes tecnologias:
     * Arquivo `components.json` para dados dos componentes
 * **Infraestrutura e Implantação:**
     * Render (para hospedagem da aplicação)
-    * Supabase (para banco de dados e autenticação)
 
 ## 🚀 Como Executar o Projeto Localmente
 
